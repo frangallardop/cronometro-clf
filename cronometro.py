@@ -8,17 +8,39 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import (QMessageBox, QMainWindow, QWidget, QApplication)
 from PyQt4.QtCore import (Qt, SIGNAL, pyqtSignature, QBasicTimer)
 
+class Round:
+    tiempo = 3
+    sonido_final = ''
+    
+    def __init__(self, numero=1):
+        self.numero = numero
+        
+    def __str__(self):
+        return "Round "+str(self.numero)
+    
+class Descanso:
+    tiempo = 1
+    sonido_final = ''
+    
+    def __str__(self):
+        return "Descanso"
+    
 class Clock(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
-	self.ui = Ui_watch()
-	self.ui.setupUi(self)
+        self.ui = Ui_watch()
+        self.ui.setupUi(self)
         
         #Inicializo variables
         self._start = 0.0        
         self._elapsedtime = 0.0
         self._running = 0
         self._setTime(self._elapsedtime)
+        
+        self.rounds = []
+        for i in range(3):
+            self.rounds.append(Round(i))
+        self.round_actual = 0
         
         #Creo mi Timer
         self.timer = QtCore.QBasicTimer()
@@ -70,17 +92,17 @@ class Clock(QtGui.QMainWindow):
             # Paro mi reloj al transcurrir 2 minutos
             #if minutes == 2 and seconds==0:
             if rminutes==0 and rseconds==0 and rhseconds==00:
-              self.timer.stop()
-              # Corrijo los milisegundos
-              hseconds=00
-              self.ui.lb_watch.setText('%02d:%02d:%02d' % (rminutes, rseconds, rhseconds))
-#              self._elapsedtime = time.time() - self._start    
-#              self._setTime(self._elapsedtime)
-              self._start = 0.0        
-              self._elapsedtime = 0.0
-              self._running = 0
-              #self._setTime(self._elapsedtime)
-              self.ui.btn_start.setText("Start")
+                self.timer.stop()
+                # Corrijo los milisegundos
+                hseconds=00
+                self.ui.lb_watch.setText('%02d:%02d:%02d' % (rminutes, rseconds, rhseconds))
+                #              self._elapsedtime = time.time() - self._start    
+                #              self._setTime(self._elapsedtime)
+                self._start = 0.0        
+                self._elapsedtime = 0.0
+                self._running = 0
+                #self._setTime(self._elapsedtime)
+                self.ui.btn_start.setText("Start")
 
         except:
             QMessageBox.warning(self, "Mensaje",
