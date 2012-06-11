@@ -8,7 +8,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import (QMessageBox, QMainWindow, QWidget, QApplication)
 from PyQt4.QtCore import (Qt, SIGNAL, pyqtSignature, QBasicTimer)
 
-class Clock(QtGui.QMainWindow):
+class VentanaTimer(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
 	self.ui = Ui_watch()
@@ -81,6 +81,6 @@ class Clock(QtGui.QMainWindow):
         
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
-    myapp = Clock()
+    myapp = VentanaTimer()
     myapp.show()
     sys.exit(app.exec_())

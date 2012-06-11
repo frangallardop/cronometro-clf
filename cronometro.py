@@ -1,127 +1,114 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
+import time, datetime
 import sys
 from ui_clockwatch import Ui_watch
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import (QMessageBox, QMainWindow, QWidget, QApplication)
-from PyQt4.QtCore import (Qt, SIGNAL, pyqtSignature, QBasicTimer)
+from PyQt4.QtCore import (Qt, SIGNAL, pyqtSignature, QBasicTimer, QObject)
 
-class Round:
-    tiempo = 3
-    sonido_final = ''
+class EstadoTimer(QObject):
+    def __init__(self, minutos=3, segundos=0, label=None, window=None):
+        super(EstadoTimer, self).__init__()
+        self.segundos = segundos + 60*minutos
+        self.segundos_iniciales = self.segundos
+        self.label = label
+        self.timer = QBasicTimer()
+        self.window = window
+        QObject.connect(self, SIGNAL("ESTADO_TIMER_FINALIZADO"), self.window.estado_timer_finalizado)
+        self.set_text(self.segundos/60, self.segundos%60, (self.segundos%1)*100)
+        
     
-    def __init__(self, numero=1):
+    def start(self):
+        self.start_time = time.time()
+        return self.timer.start(10, self)
+    
+    def pause(self):
+        elapsed_time = time.time() - self.start_time
+        self.segundos -= elapsed_time
+        return self.timer.stop()
+    
+    def reset(self):
+        if self.timer.isActive():
+            self.timer.stop()
+        self.segundos = self.segundos_iniciales
+        self.set_text(self.segundos/60, self.segundos%60, (self.segundos%1)*100)
+    
+    def is_active(self):
+        return self.timer.isActive()
+    
+    def timerEvent(self, event):
+        elapsed_time = time.time() - self.start_time
+        segundos = self.segundos - elapsed_time
+        if segundos < 0:
+            segundos = 0
+        self.set_text(segundos/60, segundos%60, (segundos%1)*100)
+        
+        if segundos == 0:
+            self.emit(SIGNAL("ESTADO_TIMER_FINALIZADO"))
+            self.timer.stop()
+            #QObject.disconnect(self, SIGNAL("ESTADO_TIMER_FINALIZADO"), self.window.estado_timer_finalizado)
+        
+    def set_text(self, minutos, segundos, centesimas):
+        self.label.setText('%02d:%02d:%02d' % (minutos, segundos, centesimas))
+    
+class Round(EstadoTimer):
+    
+    def __init__(self, numero=1, minutos=0, segundos=10, label=None, window=None):
         self.numero = numero
+        super(Round, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
         
     def __str__(self):
         return "Round "+str(self.numero)
-    
-class Descanso:
-    tiempo = 1
-    sonido_final = ''
-    
+
+
+class Descanso(EstadoTimer):
+    def __init__(self, minutos=0, segundos=5, label=None, window=None):
+        super(Descanso, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
+        
     def __str__(self):
         return "Descanso"
     
-class Clock(QtGui.QMainWindow):
+class VentanaTimer(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_watch()
         self.ui.setupUi(self)
         
-        #Inicializo variables
-        self._start = 0.0        
-        self._elapsedtime = 0.0
-        self._running = 0
-        self._setTime(self._elapsedtime)
+        self.rounds = 3
+        self.round_actual = 1
+        self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
         
-        self.rounds = []
-        for i in range(3):
-            self.rounds.append(Round(i))
-        self.round_actual = 0
-        
-        #Creo mi Timer
-        self.timer = QtCore.QBasicTimer()
-               
-    
     @pyqtSignature("")
-    def on_btn_start_clicked(self):
-        try:
-            """ Iniciar cronometro, ignorar si se está ejecutando. """
-            if not self._running:            
-                self._start = time.time() - self._elapsedtime
-                self._running = 1
-                self.timer.start(100, self)
-                self.ui.btn_start.setText("Detener")
-            else:
-                self.timer.stop()
-                self._elapsedtime = time.time() - self._start    
-                self._setTime(self._elapsedtime)
-                self.ui.btn_start.setText("Continuar")
-                self._running = 0
-                
-        except:
-            QMessageBox.warning(self, "Mensaje",
-                            unicode("Error: Controlar el botón de inicio"))
+    def on_btn_start_clicked(self):        
+        if not self.estado.is_active():
+            self.estado.start()
+            self.ui.btn_start.setText("Detener")
+        else:
+            self.estado.pause()
+            self.ui.btn_start.setText("Continuar")
+            
     @pyqtSignature("")
     def on_btn_reset_clicked(self):                                   
         """ Reinicio mi cronometro. """
-        self.timer.stop()
-        self._start = time.time()         
-        self._elapsedtime = 0.0    
-        self._setTime(self._elapsedtime)
+        self.estado.reset()
         self.ui.btn_start.setText("Start")
-        self._running = 0
         
-    def timerEvent(self, event):
-        try:
-            """ Actualizo la etiqueta con tiempo remanente. """
-            elap = time.time() - self._start
-            """ Configuro el string con Minutos, segundo y centesimas de seg. """
-            minutes = int(elap/60)
-            seconds = int(elap - minutes*60.0)
-            hseconds = int((elap - minutes*60.0 - seconds)*100)                
-            rminutes = 2 - minutes - (0 if elap==0 else 1)
-            rseconds = ((60 if elap==0 else 59)-seconds)%60
-            rhseconds = (100-hseconds)%100
-            self.ui.lb_watch.setText('%02d:%02d:%02d' % (rminutes, rseconds, rhseconds))
-            #self.ui.lb_watch.setText('%02d:%02d:%02d' % (minutes, seconds, hseconds))
-            
-            # Paro mi reloj al transcurrir 2 minutos
-            #if minutes == 2 and seconds==0:
-            if rminutes==0 and rseconds==0 and rhseconds==00:
-                self.timer.stop()
-                # Corrijo los milisegundos
-                hseconds=00
-                self.ui.lb_watch.setText('%02d:%02d:%02d' % (rminutes, rseconds, rhseconds))
-                #              self._elapsedtime = time.time() - self._start    
-                #              self._setTime(self._elapsedtime)
-                self._start = 0.0        
-                self._elapsedtime = 0.0
-                self._running = 0
-                #self._setTime(self._elapsedtime)
+    def estado_timer_finalizado(self):
+        if isinstance(self.estado, Round):
+            if self.round_actual < self.rounds:
+                self.estado = Descanso(label=self.ui.lb_watch, window=self)
+                self.round_actual += 1
                 self.ui.btn_start.setText("Start")
-
-        except:
-            QMessageBox.warning(self, "Mensaje",
-                            unicode("Error: Controlar timer"))
-        
-    
-    def _setTime(self, elap):
-        """ Configuro el string con Minutos, segundo y centesimas de seg. """
-        minutes = int(elap/60)
-        seconds = int(elap - minutes*60.0)
-        hseconds = int((elap - minutes*60.0 - seconds)*100)                
-        rminutes = 2 - minutes - (0 if elap==0 else 1)
-        rseconds = ((60 if elap==0 else 59)-seconds)%60
-        rhseconds = (100-hseconds)%100
-        self.ui.lb_watch.setText('%02d:%02d:%02d' % (rminutes, rseconds, rhseconds))
-        #self.ui.lb_watch.setText('%02d:%02d:%02d' % (minutes, seconds, hseconds))
+            else:
+                self.ui.btn_start.setText("Finalizado")
+        elif isinstance(self.estado, Descanso):
+            self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
+            self.ui.btn_start.setText("Start")
         
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
-    myapp = Clock()
+    myapp = VentanaTimer()
     myapp.show()
     sys.exit(app.exec_())
