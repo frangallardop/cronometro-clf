@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time, datetime
+import time
 import sys
 from ui_clockwatch import Ui_watch
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import (QMessageBox, QMainWindow, QWidget, QApplication)
-from PyQt4.QtCore import (Qt, SIGNAL, pyqtSignature, QBasicTimer, QObject)
+from PyQt4 import QtGui
+from PyQt4.QtGui import QSound
+from PyQt4.QtCore import SIGNAL, pyqtSignature, QBasicTimer, QObject
 
 class EstadoTimer(QObject):
     def __init__(self, minutos=3, segundos=0, label=None, window=None):
@@ -54,13 +54,25 @@ class EstadoTimer(QObject):
         self.label.setText('%02d:%02d:%02d' % (minutos, segundos, centesimas))
     
 class Round(EstadoTimer):
-    
+    gong = QSound('sounds/gong.wav')
     def __init__(self, numero=1, minutos=0, segundos=10, label=None, window=None):
         self.numero = numero
         super(Round, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
         
     def __str__(self):
         return "Round "+str(self.numero)
+    
+    def timerEvent(self, event):
+        elapsed_time = time.time() - self.start_time
+        segundos = self.segundos - elapsed_time
+        if segundos < 0:
+            segundos = 0
+        self.set_text(segundos/60, segundos%60, (segundos%1)*100)
+        
+        if segundos == 0:
+            self.gong.play()
+            self.emit(SIGNAL("ESTADO_TIMER_FINALIZADO"))
+            self.timer.stop()
 
 
 class Descanso(EstadoTimer):
