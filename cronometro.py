@@ -91,6 +91,7 @@ class VentanaTimer(QtGui.QMainWindow):
         self.rounds = 3
         self.round_actual = 1
         self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
+        self.ui.labelEstado.setText(str(self.estado))
         
     @pyqtSignature("")
     def on_btn_start_clicked(self):        
@@ -118,6 +119,7 @@ class VentanaTimer(QtGui.QMainWindow):
         elif isinstance(self.estado, Descanso):
             self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
             self.ui.btn_start.setText("Start")
+        self.ui.labelEstado.setText(str(self.estado))
         
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
