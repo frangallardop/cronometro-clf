@@ -87,7 +87,7 @@ class Descanso(EstadoTimer):
     def __str__(self):
         return "Descanso"
     
-class VentanaTimer(QtGui.QMainWindow):
+class VentanaTimer(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_watch()
