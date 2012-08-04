@@ -55,7 +55,8 @@ class EstadoTimer(QObject):
     
 class Round(EstadoTimer):
     gong = QSound('sounds/gong.wav')
-    def __init__(self, numero=1, minutos=0, segundos=10, label=None, window=None):
+    beep = QSound('sounds/beep-7.wav')
+    def __init__(self, numero=1, minutos=0, segundos=20, label=None, window=None):
         self.numero = numero
         super(Round, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
         
@@ -65,6 +66,10 @@ class Round(EstadoTimer):
     def timerEvent(self, event):
         elapsed_time = time.time() - self.start_time
         segundos = self.segundos - elapsed_time
+        
+        if round(segundos,2) in [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]:
+            self.beep.play()
+        
         if segundos < 0:
             segundos = 0
         self.set_text(segundos/60, segundos%60, (segundos%1)*100)
@@ -76,7 +81,7 @@ class Round(EstadoTimer):
 
 
 class Descanso(EstadoTimer):
-    def __init__(self, minutos=0, segundos=5, label=None, window=None):
+    def __init__(self, minutos=1, segundos=0, label=None, window=None):
         super(Descanso, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
         
     def __str__(self):
