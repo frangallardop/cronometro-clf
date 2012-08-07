@@ -56,6 +56,8 @@ class EstadoTimer(QObject):
 class Round(EstadoTimer):
     gong = QSound('sounds/gong.wav')
     beep = QSound('sounds/beep-7.wav')
+    next_beep = 10
+	
     def __init__(self, numero=1, minutos=0, segundos=20, label=None, window=None):
         self.numero = numero
         super(Round, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
@@ -67,7 +69,8 @@ class Round(EstadoTimer):
         elapsed_time = time.time() - self.start_time
         segundos = self.segundos - elapsed_time
         
-        if round(segundos,2) in [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]:
+        if segundos <= self.next_beep and self.next_beep > 0:
+            self.next_beep -= 1
             self.beep.play()
         
         if segundos < 0:
@@ -81,7 +84,7 @@ class Round(EstadoTimer):
 
 
 class Descanso(EstadoTimer):
-    def __init__(self, minutos=1, segundos=0, label=None, window=None):
+    def __init__(self, minutos=0, segundos=10, label=None, window=None):
         super(Descanso, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
         
     def __str__(self):
@@ -111,8 +114,26 @@ class VentanaTimer(QtGui.QWidget):
     def on_btn_reset_clicked(self):                                   
         """ Reinicio mi cronometro. """
         self.estado.reset()
+        self.estado.start()
+        self.ui.btn_start.setText("Detener")
+
+    @pyqtSignature("")
+    def on_btn_stop_clicked(self):
+        """ Reinicio el cronometro pero lo dejo pausado """
+        self.estado.reset()
         self.ui.btn_start.setText("Start")
-        
+    
+    @pyqtSignature("")
+    def on_btn_back_clicked(self):
+        """ Vuelvo al Round 1 para cronometrar un nuevo combate """
+        self.round_actual = 1
+        self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
+        self.ui.btn_start.setText("Start")
+        self.ui.labelEstado.setText(str(self.estado))
+        self.ui.btn_start.setEnabled(True)
+        self.ui.btn_stop.setEnabled(True)
+        self.ui.btn_reset.setEnabled(True)
+    
     def estado_timer_finalizado(self):
         if isinstance(self.estado, Round):
             if self.round_actual < self.rounds:
@@ -121,6 +142,9 @@ class VentanaTimer(QtGui.QWidget):
                 self.ui.btn_start.setText("Start")
             else:
                 self.ui.btn_start.setText("Finalizado")
+                self.ui.btn_start.setDisabled(True)
+                self.ui.btn_stop.setDisabled(True)
+                self.ui.btn_reset.setDisabled(True)
         elif isinstance(self.estado, Descanso):
             self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
             self.ui.btn_start.setText("Start")
