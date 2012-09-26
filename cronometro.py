@@ -6,7 +6,8 @@ import sys
 from ui_clockwatch import Ui_watch
 from PyQt4 import QtGui
 from PyQt4.QtGui import QSound
-from PyQt4.QtCore import SIGNAL, pyqtSignature, QBasicTimer, QObject
+from PyQt4.QtCore import *
+# from PyQt4.QtCore import SIGNAL, pyqtSignature, QBasicTimer, QObject
 
 class EstadoTimer(QObject):
     def __init__(self, minutos=3, segundos=0, label=None, window=None):
@@ -54,11 +55,11 @@ class EstadoTimer(QObject):
         self.label.setText('%02d:%02d:%02d' % (minutos, segundos, centesimas))
     
 class Round(EstadoTimer):
-    gong = QSound('sounds/gong.wav')
-    beep = QSound('sounds/beep-7.wav')
+    gong = QSound('sounds/gong_short.wav')
+    beep = QSound('sounds/beep-7-low.wav')
     next_beep = 10
 	
-    def __init__(self, numero=1, minutos=0, segundos=20, label=None, window=None):
+    def __init__(self, numero=1, minutos=3, segundos=0, label=None, window=None):
         self.numero = numero
         super(Round, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
         
@@ -84,11 +85,31 @@ class Round(EstadoTimer):
 
 
 class Descanso(EstadoTimer):
-    def __init__(self, minutos=0, segundos=10, label=None, window=None):
+    beep_descanso = QSound('sounds/beep-9.wav')
+    rest_beep = 10
+    play_beep = True
+	
+    def __init__(self, minutos=1, segundos=0, label=None, window=None):
         super(Descanso, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
         
     def __str__(self):
         return "Descanso"
+		
+    def timerEvent(self, event):
+        elapsed_time = time.time() - self.start_time
+        segundos = self.segundos - elapsed_time
+
+        if segundos <= self.rest_beep and self.play_beep == True:
+            self.play_beep = False
+            self.beep_descanso.play()
+        
+        if segundos < 0:
+            segundos = 0
+        self.set_text(segundos/60, segundos%60, (segundos%1)*100)
+        
+        if segundos == 0:
+            self.emit(SIGNAL("ESTADO_TIMER_FINALIZADO"))
+            self.timer.stop()
     
 class VentanaTimer(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -101,6 +122,44 @@ class VentanaTimer(QtGui.QWidget):
         self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
         self.ui.labelEstado.setText(str(self.estado))
         
+    @pyqtSignature("")
+    def keyPressEvent(self, event):
+        key = event.key()
+        # Start / Stop
+        if key == Qt.Key_S : 
+            if not self.estado.is_active():
+                self.estado.start()
+
+            else:
+                self.estado.pause()
+
+        # Vuelvo al Round 1 para cronometrar un nuevo combate
+        if key == Qt.Key_R or key == Qt.Key_1 :
+            self.round_actual = 1
+            self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
+            self.ui.btn_start.setText("Start")
+            self.ui.labelEstado.setText(str(self.estado))
+
+		# Reiniciar en round 2 o 3 (categoria full)
+        if self.rounds >= 2 and key == Qt.Key_2 :
+            self.round_actual = 2
+            self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
+            self.ui.btn_start.setText("Start")
+            self.ui.labelEstado.setText(str(self.estado))
+
+        if self.rounds >= 3 and key == Qt.Key_3 :
+            self.round_actual = 3
+            self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
+            self.ui.btn_start.setText("Start")
+            self.ui.labelEstado.setText(str(self.estado))
+			
+        # Exit cronometro
+        if key == Qt.Key_Escape :
+            self.close()
+            sys.exit(0)
+
+    # Codigo antiguo: manejo de cronometro usando botones (mouse)
+    # Se reemplaza por control en base a teclado
     @pyqtSignature("")
     def on_btn_start_clicked(self):        
         if not self.estado.is_active():
@@ -133,6 +192,7 @@ class VentanaTimer(QtGui.QWidget):
         self.ui.btn_start.setEnabled(True)
         self.ui.btn_stop.setEnabled(True)
         self.ui.btn_reset.setEnabled(True)
+    # Fin codigo antiguo: manejo de cronometro usando botones (mouse)
     
     def estado_timer_finalizado(self):
         if isinstance(self.estado, Round):
@@ -140,6 +200,7 @@ class VentanaTimer(QtGui.QWidget):
                 self.estado = Descanso(label=self.ui.lb_watch, window=self)
                 self.round_actual += 1
                 self.ui.btn_start.setText("Start")
+                self.estado.start()
             else:
                 self.ui.btn_start.setText("Finalizado")
                 self.ui.btn_start.setDisabled(True)
@@ -148,10 +209,13 @@ class VentanaTimer(QtGui.QWidget):
         elif isinstance(self.estado, Descanso):
             self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
             self.ui.btn_start.setText("Start")
+            self.estado.start()
         self.ui.labelEstado.setText(str(self.estado))
         
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     myapp = VentanaTimer()
+    # myapp.setWindowFlags(myapp.windowFlags() | Qt.SplashScreen);
+    myapp.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowSystemMenuHint);
     myapp.show()
     sys.exit(app.exec_())

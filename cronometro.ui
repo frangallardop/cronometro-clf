@@ -162,10 +162,13 @@ background-color: rgb(0,0, 0);</string>
      </item>
      <item>
       <widget class="QPushButton" name="btn_start">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="maximumSize">
         <size>
          <width>120</width>
-         <height>16777215</height>
+         <height>15</height>
         </size>
        </property>
        <property name="font">
@@ -176,8 +179,10 @@ background-color: rgb(0,0, 0);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(85, 85, 85);</string>
+        <string notr="true">/*color: rgb(255, 255, 255);
+background-color: rgb(85, 85, 85);*/
+color: rgb(0, 0, 0);
+background-color: rgb(0,0, 0);</string>
        </property>
        <property name="text">
         <string>Start</string>
@@ -187,12 +192,12 @@ background-color: rgb(85, 85, 85);</string>
      <item>
       <widget class="QPushButton" name="btn_back">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="maximumSize">
         <size>
          <width>150</width>
-         <height>16777215</height>
+         <height>15</height>
         </size>
        </property>
        <property name="font">
@@ -201,8 +206,10 @@ background-color: rgb(85, 85, 85);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(85, 85, 85);</string>
+        <string notr="true">/*color: rgb(255, 255, 255);
+background-color: rgb(85, 85, 85);*/
+color: rgb(0, 0, 0);
+background-color: rgb(0,0, 0);</string>
        </property>
        <property name="text">
         <string>Nuevo combate</string>
@@ -211,10 +218,13 @@ background-color: rgb(85, 85, 85);</string>
      </item>
      <item>
       <widget class="QPushButton" name="btn_exit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="maximumSize">
         <size>
          <width>120</width>
-         <height>16777215</height>
+         <height>15</height>
         </size>
        </property>
        <property name="font">
@@ -225,8 +235,10 @@ background-color: rgb(85, 85, 85);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(85, 85, 85);</string>
+        <string notr="true">/*color: rgb(255, 255, 255);
+background-color: rgb(85, 85, 85);*/
+color: rgb(0, 0, 0);
+background-color: rgb(0,0, 0);</string>
        </property>
        <property name="text">
         <string>Exit</string>

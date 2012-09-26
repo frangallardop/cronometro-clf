@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'cronometro.ui'
 #
-# Created: Tue Aug 07 08:15:15 2012
+# Created: Tue Sep 25 06:38:17 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -71,35 +71,43 @@ class Ui_watch(object):
         self.btn_stop.setObjectName(_fromUtf8("btn_stop"))
         self.horizontalLayout_6.addWidget(self.btn_stop)
         self.btn_start = QtGui.QPushButton(watch)
-        self.btn_start.setMaximumSize(QtCore.QSize(120, 16777215))
+        self.btn_start.setEnabled(False)
+        self.btn_start.setMaximumSize(QtCore.QSize(120, 15))
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.btn_start.setFont(font)
-        self.btn_start.setStyleSheet(_fromUtf8("color: rgb(255, 255, 255);\n"
-"background-color: rgb(85, 85, 85);"))
+        self.btn_start.setStyleSheet(_fromUtf8("/*color: rgb(255, 255, 255);\n"
+"background-color: rgb(85, 85, 85);*/\n"
+"color: rgb(0, 0, 0);\n"
+"background-color: rgb(0,0, 0);"))
         self.btn_start.setObjectName(_fromUtf8("btn_start"))
         self.horizontalLayout_6.addWidget(self.btn_start)
         self.btn_back = QtGui.QPushButton(watch)
-        self.btn_back.setEnabled(True)
-        self.btn_back.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.btn_back.setEnabled(False)
+        self.btn_back.setMaximumSize(QtCore.QSize(150, 15))
         font = QtGui.QFont()
         font.setPointSize(11)
         self.btn_back.setFont(font)
-        self.btn_back.setStyleSheet(_fromUtf8("color: rgb(255, 255, 255);\n"
-"background-color: rgb(85, 85, 85);"))
+        self.btn_back.setStyleSheet(_fromUtf8("/*color: rgb(255, 255, 255);\n"
+"background-color: rgb(85, 85, 85);*/\n"
+"color: rgb(0, 0, 0);\n"
+"background-color: rgb(0,0, 0);"))
         self.btn_back.setObjectName(_fromUtf8("btn_back"))
         self.horizontalLayout_6.addWidget(self.btn_back)
         self.btn_exit = QtGui.QPushButton(watch)
-        self.btn_exit.setMaximumSize(QtCore.QSize(120, 16777215))
+        self.btn_exit.setEnabled(False)
+        self.btn_exit.setMaximumSize(QtCore.QSize(120, 15))
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.btn_exit.setFont(font)
-        self.btn_exit.setStyleSheet(_fromUtf8("color: rgb(255, 255, 255);\n"
-"background-color: rgb(85, 85, 85);"))
+        self.btn_exit.setStyleSheet(_fromUtf8("/*color: rgb(255, 255, 255);\n"
+"background-color: rgb(85, 85, 85);*/\n"
+"color: rgb(0, 0, 0);\n"
+"background-color: rgb(0,0, 0);"))
         self.btn_exit.setObjectName(_fromUtf8("btn_exit"))
         self.horizontalLayout_6.addWidget(self.btn_exit)
         self.btn_reset = QtGui.QPushButton(watch)
