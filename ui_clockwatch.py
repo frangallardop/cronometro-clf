@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'cronometro.ui'
 #
-# Created: Fri Oct 05 00:51:33 2012
+# Created: Sat Oct 06 13:15:38 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,13 +26,15 @@ class Ui_watch(object):
         watch.setSizePolicy(sizePolicy)
         watch.setMinimumSize(QtCore.QSize(700, 500))
         watch.setWhatsThis(_fromUtf8(""))
-        watch.setStyleSheet(_fromUtf8("background-color: rgb(0, 0, 50);"))
+        watch.setStyleSheet(_fromUtf8("/*background-color: rgb(0,0,0);*/\n"
+"/*background-color: rgb(0, 0, 50);*/\n"
+"background-color: rgb(0, 40, 30);"))
         self.gridLayout = QtGui.QGridLayout(watch)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.lb_watch = QtGui.QLabel(watch)
         self.lb_watch.setMinimumSize(QtCore.QSize(0, 250))
         font = QtGui.QFont()
-        font.setPointSize(220)
+        font.setPointSize(150)
         self.lb_watch.setFont(font)
         self.lb_watch.setStyleSheet(_fromUtf8("color: rgb(255, 255, 0);"))
         self.lb_watch.setAlignment(QtCore.Qt.AlignCenter)

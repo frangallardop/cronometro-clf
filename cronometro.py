@@ -59,7 +59,7 @@ class Round(EstadoTimer):
     beep = QSound('sounds/beep-7.wav')
     next_beep = 10
 	
-    def __init__(self, numero=1, minutos=2, segundos=0, label=None, window=None):
+    def __init__(self, numero=1, minutos=1, segundos=30, label=None, window=None):
         self.numero = numero
         super(Round, self).__init__(minutos=minutos, segundos=segundos, label=label, window=window)
         
@@ -118,7 +118,7 @@ class VentanaTimer(QtGui.QWidget):
         self.ui.setupUi(self)
         self.maximized = True
         
-        self.rounds = 3
+        self.rounds = 1
         self.round_actual = 1
         self.estado = Round(numero=self.round_actual, label=self.ui.lb_watch, window=self)
         self.ui.labelEstado.setText(str(self.estado))

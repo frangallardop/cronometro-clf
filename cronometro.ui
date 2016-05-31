@@ -32,7 +32,9 @@
    <string/>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(0, 0, 50);</string>
+   <string notr="true">/*background-color: rgb(0,0,0);*/
+/*background-color: rgb(0, 0, 50);*/
+background-color: rgb(0, 40, 30);</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="1">
@@ -45,7 +47,7 @@
      </property>
      <property name="font">
       <font>
-       <pointsize>220</pointsize>
+       <pointsize>180</pointsize>
       </font>
      </property>
      <property name="styleSheet">
